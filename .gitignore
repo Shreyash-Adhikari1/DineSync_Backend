@@ -1,0 +1,22 @@
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Dependencies
+/node_modules
+
+# TypeScript build output
+/dist
+
+# OS generated files
+.DS_Store
+
+# Test coverage
+/coverage
+
+# The Uploaded Files
+/uploads/challenge-images/ 
+/uploads/post-images/
+/uploads/profile-image/
+/uploads/challenge-submissions/ 
