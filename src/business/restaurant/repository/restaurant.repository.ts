@@ -52,7 +52,7 @@ export class RestaurantRepository implements RestaurantRepositoryInterface {
       {
         $set: updateData,
       },
-      { new: true },
+      { returnDocument: "after" },
     ).exec();
   }
   deleteRestaurant(restaurantId: string): Promise<IRestaurant | null> {

@@ -3,29 +3,40 @@ import { RestaurantController } from "../controller/restaurant.controller";
 import { authMiddleware } from "../../../middleware/auth.middleware";
 
 const restaurantRouter = Router();
-
 const restaurantController = new RestaurantController();
 
+/**
+ * Create restaurant
+ */
 restaurantRouter.post(
-  "/create",
+  "/",
   authMiddleware,
   restaurantController.createRestaurant,
 );
 
+/**
+ * Update restaurant
+ */
 restaurantRouter.patch(
-  "/edit/:restaurantId",
+  "/:restaurantId",
   authMiddleware,
   restaurantController.updateRestaurant,
 );
 
+/**
+ * Delete restaurant
+ */
 restaurantRouter.delete(
-  "/delete/:restaurantId",
+  "/:restaurantId",
   authMiddleware,
   restaurantController.deleteRestaurant,
 );
 
+/**
+ * Get all restaurants owned by business
+ */
 restaurantRouter.get(
-  "/own-restaurants",
+  "/own",
   authMiddleware,
   restaurantController.getRestaurantsByBusiness,
 );

@@ -6,7 +6,7 @@ import { IRestaurant } from "../model/restaurant.model";
 import {
   RestaurantRepository,
   RestaurantRepositoryInterface,
-} from "../repo/restaurant.repository";
+} from "../repository/restaurant.repository";
 import { promises } from "node:dns";
 
 const restaurantRepo = new RestaurantRepository();
