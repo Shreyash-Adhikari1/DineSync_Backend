@@ -47,7 +47,7 @@ export class BusinessRepository implements BusinessRepositoryInterface {
       {
         $set: updatedData,
       },
-      { new: true },
+      { returnDocument: "after" },
     ).exec();
   }
 
