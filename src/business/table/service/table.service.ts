@@ -5,13 +5,11 @@ import { TableRepository } from "../repo/table.repository";
 import { CreateTableDTO, EditTableDTO } from "../dto/table.dto";
 import { ITable } from "../model/table.model";
 import { RestaurantRepository } from "../../restaurant/repository/restaurant.repository";
-import dotenv from "dotenv";
+import { FRONTEND_BASE_URL } from "../../../config/env";
 
 const restaurantRepo = new RestaurantRepository();
 const tableRepo = new TableRepository();
 
-dotenv.config();
-const CLIENT_URL = process.env.CLIENT_URL as string;
 export class TableService {
   async createTable(
     ownerId: string,
@@ -27,10 +25,15 @@ export class TableService {
       throw new HttpError(404, "Restaurant Not Found");
     }
 
-    const totalTables = await tableRepo.countRestaurantTables(restaurantId);
-    const nextTableNumber = totalTables + 1;
+    const highestTableNumber = await tableRepo.getHighestTableNumber(
+      restaurantId,
+    );
+    const nextTableNumber = highestTableNumber + 1;
     const qrToken = nanoid(10);
-    const joinUrl = `${CLIENT_URL}/join/${qrToken}`;
+    if (!FRONTEND_BASE_URL) {
+      throw new HttpError(500, "FRONTEND_BASE_URL is not configured");
+    }
+    const joinUrl = `${FRONTEND_BASE_URL}/join/${qrToken}`;
     const qrCode = await QRCode.toDataURL(joinUrl);
 
     const tableToCreate = {
@@ -96,6 +99,21 @@ export class TableService {
     ownerId: string,
     tableId: string,
   ): Promise<{ message: string }> {
+    const table = await tableRepo.findTableById(tableId);
+
+    if (!table) {
+      throw new HttpError(404, "Table Not Found");
+    }
+
+    const restaurant = await restaurantRepo.findRestaurantByOwnerAndId(
+      ownerId,
+      table.restaurantId.toString(),
+    );
+
+    if (!restaurant) {
+      throw new HttpError(404, "Restaurant Not Found");
+    }
+
     const deleteTable = await tableRepo.deleteTableById(tableId);
     if (!deleteTable) {
       throw new HttpError(400, "Failed To Delete Table");
@@ -108,13 +126,21 @@ export class TableService {
 
   async toggleTableActive(
     ownerId: string,
-    restaurantId: string,
     tableId: string,
   ): Promise<ITable> {
     const table = await tableRepo.findTableById(tableId);
 
     if (!table) {
       throw new HttpError(404, "Table Not Found");
+    }
+
+    const restaurant = await restaurantRepo.findRestaurantByOwnerAndId(
+      ownerId,
+      table.restaurantId.toString(),
+    );
+
+    if (!restaurant) {
+      throw new HttpError(404, "Restaurant Not Found");
     }
 
     if (table.isActive) {

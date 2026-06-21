@@ -61,11 +61,13 @@ export class MenuController {
       }
 
       const menuFileName = (req.file as any)?.filename;
+      const updateData = { ...parsed.data };
+      if (menuFileName) updateData.imageUrl = menuFileName;
 
       const menuItem = await menuService.editMenuItem(
         ownerId,
         menuItemId as string,
-        { ...parsed.data, imageUrl: menuFileName },
+        updateData,
       );
 
       return res.status(200).json({
@@ -127,11 +129,9 @@ export class MenuController {
 
   getMenuByRestaurant = async (req: Request, res: Response) => {
     try {
-      const ownerId = (req as any).business.id;
       const { restaurantId } = req.params;
 
       const menu = await menuService.getMenuByRestaurant(
-        ownerId,
         restaurantId as string,
       );
 
@@ -149,13 +149,9 @@ export class MenuController {
 
   getAvailableMenu = async (req: Request, res: Response) => {
     try {
-      const ownerId = (req as any).business.id;
       const { restaurantId } = req.params;
 
-      const menu = await menuService.getAvailableMenu(
-        ownerId,
-        restaurantId as string,
-      );
+      const menu = await menuService.getAvailableMenu(restaurantId as string);
 
       return res.status(200).json({
         success: true,
@@ -171,12 +167,9 @@ export class MenuController {
 
   getMenuByCategory = async (req: Request, res: Response) => {
     try {
-      const ownerId = (req as any).business.id;
-
       const { restaurantId, category } = req.params;
 
       const menu = await menuService.getMenuByCategory(
-        ownerId,
         restaurantId as string,
         category as "mains" | "starters" | "drinks",
       );
@@ -187,6 +180,24 @@ export class MenuController {
       });
     } catch (error: any) {
       return res.status(500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
+  };
+
+  getMenuItemById = async (req: Request, res: Response) => {
+    try {
+      const { menuItemId } = req.params;
+
+      const menuItem = await menuService.getMenuItemById(menuItemId as string);
+
+      return res.status(200).json({
+        success: true,
+        menuItem,
+      });
+    } catch (error: any) {
+      return res.status(error.statusCode || 500).json({
         success: false,
         message: error.message || "Internal Server Error",
       });

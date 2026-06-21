@@ -106,28 +106,16 @@ export class MenuService {
     return { message: "Menu Deleted Successfully" };
   }
 
-  async getMenuByRestaurant(
-    ownerId: string,
-    restaurantId: string,
-  ): Promise<IMenuItem[]> {
-    const restaurant = await restaurantRepo.findRestaurantByOwnerAndId(
-      ownerId,
-      restaurantId,
-    );
+  async getMenuByRestaurant(restaurantId: string): Promise<IMenuItem[]> {
+    const restaurant = await restaurantRepo.findRestaurantById(restaurantId);
     if (!restaurant) {
       throw new HttpError(404, "Restaurant Not Found");
     }
     return menuRepo.getMenuByRestaurant(restaurantId);
   }
 
-  async getAvailableMenu(
-    ownerId: string,
-    restaurantId: string,
-  ): Promise<IMenuItem[]> {
-    const restaurant = await restaurantRepo.findRestaurantByOwnerAndId(
-      ownerId,
-      restaurantId,
-    );
+  async getAvailableMenu(restaurantId: string): Promise<IMenuItem[]> {
+    const restaurant = await restaurantRepo.findRestaurantById(restaurantId);
     if (!restaurant) {
       throw new HttpError(404, "Restaurant Not Found");
     }
@@ -135,18 +123,24 @@ export class MenuService {
   }
 
   async getMenuByCategory(
-    ownerId: string,
     restaurantId: string,
     category: IMenuItem["category"],
   ): Promise<IMenuItem[]> {
-    const restaurant = await restaurantRepo.findRestaurantByOwnerAndId(
-      ownerId,
-      restaurantId,
-    );
+    const restaurant = await restaurantRepo.findRestaurantById(restaurantId);
     if (!restaurant) {
       throw new HttpError(404, "Restaurant Not Found");
     }
     return await menuRepo.getMenuByCategory(restaurantId, category);
+  }
+
+  async getMenuItemById(menuItemId: string): Promise<IMenuItem> {
+    const menuItem = await menuRepo.getMenuItemById(menuItemId);
+
+    if (!menuItem) {
+      throw new HttpError(404, "Menu Item Not Found");
+    }
+
+    return menuItem;
   }
 
   async toggleItemPopularity(

@@ -125,11 +125,10 @@ export class TableController {
     try {
       const ownerId = (req as any).business.id;
 
-      const { restaurantId, tableId } = req.params;
+      const { tableId } = req.params;
 
       const table = await tableService.toggleTableActive(
         ownerId,
-        restaurantId as string,
         tableId as string,
       );
 

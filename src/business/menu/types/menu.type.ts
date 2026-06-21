@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+const CommonAllergensSchema = z
+  .union([z.string(), z.array(z.string())])
+  .optional()
+  .transform((val) => {
+    if (!val) return [];
+    const values = Array.isArray(val) ? val : val.split(",");
+    return values.map((v) => v.trim()).filter(Boolean);
+  });
+
 export const MenuItemSchema = z.object({
   _id: z.string().optional(),
   ownerId: z.string().optional(),
@@ -16,10 +25,5 @@ export const MenuItemSchema = z.object({
   isAvailable: z.boolean().default(true),
   isPopular: z.boolean().default(false),
 
-  commonAllergens: z.string().transform((val) =>
-    val
-      .split(",")
-      .map((v) => v.trim())
-      .filter(Boolean),
-  ),
+  commonAllergens: CommonAllergensSchema,
 });

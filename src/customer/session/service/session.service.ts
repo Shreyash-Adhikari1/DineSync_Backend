@@ -11,10 +11,23 @@ const tableRepo = new TableRepository();
 const restaurantRepo = new RestaurantRepository();
 
 export class SessionService {
+  private async withRestaurantName(session: ISession) {
+    const restaurant = await restaurantRepo.findRestaurantById(
+      session.restaurantId.toString(),
+    );
+    const sessionObject =
+      typeof session.toObject === "function" ? session.toObject() : session;
+
+    return {
+      ...sessionObject,
+      restaurantName: restaurant?.restaurantName || "DineSync",
+    };
+  }
+
   async joinTable(
     qrToken: string,
     memberName: string,
-  ): Promise<{ session: ISession; memberId: string }> {
+  ): Promise<{ session: any; memberId: string }> {
     const table = await tableRepo.findTableByQrToken(qrToken);
 
     if (!table) {
@@ -52,17 +65,17 @@ export class SessionService {
       joinedAt: new Date(),
     });
 
-    return { session: updatedSession, memberId };
+    return { session: await this.withRestaurantName(updatedSession), memberId };
   }
 
-  async getSession(sessionId: string): Promise<ISession> {
+  async getSession(sessionId: string): Promise<any> {
     const session = await sessionRepo.findSessionById(sessionId);
 
     if (!session) {
       throw new HttpError(404, "Session Not Found");
     }
 
-    return session;
+    return this.withRestaurantName(session);
   }
 
   async getActiveSessionByTable(tableId: string): Promise<ISession | null> {

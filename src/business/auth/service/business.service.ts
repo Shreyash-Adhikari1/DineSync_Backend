@@ -4,14 +4,11 @@ import {
   BusinessRepository,
   BusinessRepositoryInterface,
 } from "../repo/businesss.repository";
-import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 const businessRepository: BusinessRepositoryInterface =
   new BusinessRepository();
-dotenv.config();
-const CLIENT_URL = process.env.CLIENT_URL as string;
 
 export class BusinessService {
   // doing this because we dont want password going everywhere

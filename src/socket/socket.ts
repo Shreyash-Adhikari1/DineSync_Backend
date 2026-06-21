@@ -1,11 +1,12 @@
 import { Server } from "socket.io";
+import { CORS_ORIGINS } from "../config/env";
 
 let io: Server;
 
 export const initializeSocket = (server: any) => {
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+      origin: CORS_ORIGINS,
       credentials: true,
     },
   });

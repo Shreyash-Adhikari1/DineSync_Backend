@@ -20,23 +20,19 @@ menuRouter.patch(
   menuController.updateMenuItem,
 );
 
-menuRouter.get(
-  "/restaurant/:restaurantId",
-  authMiddleware,
-  menuController.getMenuByRestaurant,
-);
+menuRouter.get("/restaurant/:restaurantId", menuController.getMenuByRestaurant);
 
 menuRouter.get(
   "/restaurant/:restaurantId/available",
-  authMiddleware,
   menuController.getAvailableMenu,
 );
 
 menuRouter.get(
   "/restaurant/:restaurantId/category/:category",
-  authMiddleware,
   menuController.getMenuByCategory,
 );
+
+menuRouter.get("/item/:menuItemId", menuController.getMenuItemById);
 
 menuRouter.delete(
   "/restaurant/:restaurantId/:menuItemId",

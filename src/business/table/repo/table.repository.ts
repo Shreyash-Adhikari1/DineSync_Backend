@@ -21,6 +21,7 @@ export interface TableRepositoryInterface {
   deleteTableById(tableId: string): Promise<ITable | null>;
 
   countRestaurantTables(restaurantId: string): Promise<number>;
+  getHighestTableNumber(restaurantId: string): Promise<number>;
 
   setTableActive(tableId: string): Promise<ITable | null>;
   setTableInactive(tableId: string): Promise<ITable | null>;
@@ -86,6 +87,16 @@ export class TableRepository implements TableRepositoryInterface {
     return TableModel.countDocuments({
       restaurantId,
     }).exec();
+  }
+
+  async getHighestTableNumber(restaurantId: string): Promise<number> {
+    const table = await TableModel.findOne({ restaurantId })
+      .sort({ tableNumber: -1 })
+      .select("tableNumber")
+      .lean()
+      .exec();
+
+    return table?.tableNumber || 0;
   }
 
   setTableActive(tableId: string): Promise<ITable | null> {
